@@ -1,6 +1,250 @@
-document.querySelectorAll('.photo img').forEach(img=>{img.addEventListener('error',()=>img.closest('.photo')?.classList.add('image-error'),{once:true});});
-const startBtn=document.getElementById('startBtn');const wishBtn=document.getElementById('wishBtn');const wishText=document.getElementById('wishText');const musicBtn=document.getElementById('musicBtn');const confettiBox=document.getElementById('confetti');const sparkles=document.getElementById('sparkles');let wished=false;let audioCtx=null;
-function makeSound(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const notes=[523.25,659.25,783.99,1046.5];notes.forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime+i*.12;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.07,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.4)})}catch(e){}}
-function confetti(n=90){const shapes=['◆','●','■','★'];for(let i=0;i<n;i++){const p=document.createElement('div');p.className='confetti-piece';p.textContent=shapes[Math.floor(Math.random()*shapes.length)];p.style.left=Math.random()*100+'vw';p.style.setProperty('--x',Math.random()*260-130+'px');p.style.animationDelay=Math.random()*.8+'s';p.style.fontSize=8+Math.random()*12+'px';p.style.color=['#e5bd61','#f8e4a7','#8eb7dd','#fff'][Math.floor(Math.random()*4)];confettiBox.appendChild(p);setTimeout(()=>p.remove(),4500)}}
-function addSparkles(){for(let i=0;i<45;i++){const s=document.createElement('div');s.className='spark';s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';s.style.animationDelay=Math.random()*2+'s';s.style.animationDuration=1.4+Math.random()*2.5+'s';sparkles.appendChild(s)}}
-startBtn.addEventListener('click',()=>{document.getElementById('intro').scrollIntoView({behavior:'smooth'});confetti(35);makeSound()});wishBtn.addEventListener('click',()=>{if(!wished){wished=true;document.querySelectorAll('.candle i').forEach(f=>{f.style.animation='none';f.style.opacity='0';f.style.transform='scale(.2)'});wishText.textContent='Wish made! 🎉 May every good wish come true for you, Baava.';wishBtn.textContent='Birthday Wish Sent ❤️';confetti(130);makeSound()}});musicBtn.addEventListener('click',()=>{makeSound();musicBtn.textContent=musicBtn.textContent==='♫'?'♪':'♫'});addSparkles();
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* =========================
+       PARTICLES
+    ========================= */
+
+    const particlesContainer =
+        document.getElementById("particles");
+
+    const particleCount = 35;
+
+    for (let i = 0; i < particleCount; i++) {
+
+        const particle = document.createElement("span");
+
+        particle.className = "particle";
+
+        particle.style.left =
+            Math.random() * 100 + "%";
+
+        particle.style.animationDuration =
+            (Math.random() * 12 + 8) + "s";
+
+        particle.style.animationDelay =
+            (Math.random() * 10) + "s";
+
+        const size =
+            Math.random() * 3 + 2;
+
+        particle.style.width = size + "px";
+
+        particle.style.height = size + "px";
+
+        particlesContainer.appendChild(particle);
+    }
+
+
+    /* =========================
+       IMAGE LIGHTBOX
+    ========================= */
+
+    const cards =
+        document.querySelectorAll(".memory-card");
+
+    const lightbox =
+        document.getElementById("lightbox");
+
+    const lightboxImage =
+        document.getElementById("lightboxImage");
+
+    const closeBtn =
+        document.getElementById("closeBtn");
+
+    const prevBtn =
+        document.getElementById("prevBtn");
+
+    const nextBtn =
+        document.getElementById("nextBtn");
+
+
+    let currentIndex = 0;
+
+
+    /*
+     * Get the actual image filenames
+     * directly from the HTML.
+     *
+     * This means the JPG names are never
+     * changed by JavaScript.
+     */
+
+    const images = Array.from(cards).map(card => {
+
+        return card.querySelector("img").getAttribute("src");
+
+    });
+
+
+    /* Open image */
+
+    function openLightbox(index) {
+
+        currentIndex = index;
+
+        lightboxImage.src =
+            images[currentIndex];
+
+        lightboxImage.alt =
+            cards[currentIndex]
+                .querySelector("img")
+                .alt;
+
+        lightbox.classList.add("active");
+
+        document.body.style.overflow = "hidden";
+    }
+
+
+    /* Close */
+
+    function closeLightbox() {
+
+        lightbox.classList.remove("active");
+
+        document.body.style.overflow = "";
+
+        setTimeout(() => {
+
+            lightboxImage.src = "";
+
+        }, 300);
+    }
+
+
+    /* Next */
+
+    function nextImage() {
+
+        currentIndex++;
+
+        if (currentIndex >= images.length) {
+
+            currentIndex = 0;
+        }
+
+        lightboxImage.src =
+            images[currentIndex];
+
+        lightboxImage.alt =
+            cards[currentIndex]
+                .querySelector("img")
+                .alt;
+    }
+
+
+    /* Previous */
+
+    function previousImage() {
+
+        currentIndex--;
+
+        if (currentIndex < 0) {
+
+            currentIndex = images.length - 1;
+        }
+
+        lightboxImage.src =
+            images[currentIndex];
+
+        lightboxImage.alt =
+            cards[currentIndex]
+                .querySelector("img")
+                .alt;
+    }
+
+
+    /* Card click */
+
+    cards.forEach((card, index) => {
+
+        card.addEventListener("click", () => {
+
+            openLightbox(index);
+
+        });
+
+    });
+
+
+    /* Button events */
+
+    closeBtn.addEventListener(
+        "click",
+        closeLightbox
+    );
+
+    nextBtn.addEventListener(
+        "click",
+        nextImage
+    );
+
+    prevBtn.addEventListener(
+        "click",
+        previousImage
+    );
+
+
+    /* Click outside image */
+
+    lightbox.addEventListener("click", event => {
+
+        if (event.target === lightbox) {
+
+            closeLightbox();
+
+        }
+
+    });
+
+
+    /* Keyboard controls */
+
+    document.addEventListener("keydown", event => {
+
+        if (!lightbox.classList.contains("active")) {
+
+            return;
+        }
+
+        if (event.key === "Escape") {
+
+            closeLightbox();
+
+        }
+
+        if (event.key === "ArrowRight") {
+
+            nextImage();
+
+        }
+
+        if (event.key === "ArrowLeft") {
+
+            previousImage();
+
+        }
+
+    });
+
+
+    /* =========================
+       IMAGE ERROR HANDLING
+    ========================= */
+
+    document
+        .querySelectorAll(".memory-card img")
+        .forEach(img => {
+
+            img.addEventListener("error", () => {
+
+                console.error(
+                    "Could not load image:",
+                    img.src
+                );
+
+            });
+
+        });
+
+});
